@@ -5,7 +5,8 @@ import {
   ChangeEvent,
   useContext,
 } from "react";
-import { IComment } from "../../ts/interfaces";
+import { IComment } from "../../ts/comment";
+import {ToastStatus} from "../../ts/toaster"
 import axios, { AxiosError } from "axios";
 import StateHandler from "../StateHandler/StateHandler";
 import Comment from "./Comment";
@@ -60,10 +61,10 @@ function Comments({ articleId }: { articleId: string | undefined }) {
 
       setComment("");
       await getComments();
-      addToast("Successfully commented", 1);
+      addToast("Successfully commented", ToastStatus.Success);
     } catch (error) {
       const err = error as AxiosError;
-      addToast(err.message, -1);
+      addToast(err.message, ToastStatus.Error);
       console.error("Error in getting comments:", error);
     } finally {
       setIsLeaveCommentDisabled(false);
@@ -79,11 +80,10 @@ function Comments({ articleId }: { articleId: string | undefined }) {
         },
       });
       setComments(comments.filter((x) => x.id !== id));
-      addToast("Successfully deleted comment", 1);
-      return true;
+      addToast("Successfully deleted comment", ToastStatus.Success);
     } catch (error) {
       const err = error as AxiosError;
-      addToast(err.message, -1);
+      addToast(err.message, ToastStatus.Error);
       console.error("Error in deleting article:", error);
     }
   };
@@ -107,7 +107,7 @@ function Comments({ articleId }: { articleId: string | undefined }) {
 
   return (
     <div className="flex flex-col gap-4 py-4">
-      <span className="font-bold">Comments ({comments.length}):</span>
+      <span className="font-bold ml-3">Comments ({comments.length}):</span>
       <div className="flex items-center w-full bg-gray-50 p-2 gap-2 border rounded-xl sm:h-20 border-gray-100 max-sm:flex-col">
         <textarea
           className="p-4 border border-gray-200 rounded-lg h-full appearance-none resize-none w-full"
@@ -148,7 +148,7 @@ function Comments({ articleId }: { articleId: string | undefined }) {
           </div>
         </StateHandler.Empty>
         <StateHandler.Success>
-          <div className="flex flex-col px-4">
+          <div className="flex flex-col px-3">
             {comments.map((comment) => (
               <Comment
                 key={comment.id}

@@ -1,5 +1,5 @@
 import Modal from "../Modal";
-import { IArticle } from "../../ts/interfaces";
+import { IArticle, IBaseArticle } from "../../ts/article";
 import {
   ChangeEvent,
   Dispatch,
@@ -11,8 +11,8 @@ import {
 interface IProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  editArticle: (editedArticle: IArticle) => void;
-  article: IArticle | null;
+  editArticle: (editedArticle: IBaseArticle) => Promise<void>;
+  article: IArticle | IBaseArticle;
 }
 
 function EditArticleModal({
@@ -22,14 +22,15 @@ function EditArticleModal({
   article,
 }: IProps) {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const [editedArticle, setEditedArticle] = useState<IArticle>(
-    article ? article : { id: NaN, title: "", content: "" }
+  const [editedArticle, setEditedArticle] = useState<IBaseArticle | null>(
+    article
   );
 
   // Two-way binding
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    if (!editedArticle) return;
     const { name, value } = e.target;
     setEditedArticle({
       ...editedArticle,
@@ -39,18 +40,24 @@ function EditArticleModal({
 
   // Hooks
   useEffect(() => {
-    if (
-      (article?.title === editedArticle.title &&
-        article.content === editedArticle.content) ||
-      !editedArticle.title ||
-      !editedArticle.content
-    ) {
-      setIsSubmitDisabled(true);
-    } else {
+    const isAnyFieldEmpty =
+      !editedArticle?.title.trim() ||
+      !editedArticle?.content.trim() ||
+      !editedArticle?.description.trim();
+
+    const isAnyFieldModified =
+      article?.title !== editedArticle?.title.trim() ||
+      article?.content !== editedArticle?.content.trim() ||
+      article?.description !== editedArticle?.description.trim();
+
+    if (!isAnyFieldEmpty && isAnyFieldModified) {
       setIsSubmitDisabled(false);
+    } else {
+      setIsSubmitDisabled(true);
     }
   }, [article, editedArticle]);
 
+  if (!editedArticle) return;
   return (
     <Modal openState={[showModal, setShowModal]} title="Edit Article">
       <form
@@ -68,6 +75,16 @@ function EditArticleModal({
             name="title"
             placeholder="Title"
             value={editedArticle.title}
+            onChange={handleChange}
+          />
+        </label>
+        <label htmlFor="description">
+          <div className="text-xs text-gray-600 mb-2 ml-2">Content</div>
+          <textarea
+            className="textarea w-full"
+            name="description"
+            placeholder="Description"
+            value={editedArticle.description}
             onChange={handleChange}
           />
         </label>

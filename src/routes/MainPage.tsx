@@ -1,31 +1,30 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Articles from "../components/Articles/Articles";
-import { IArticle } from "../ts/interfaces";
-import axios, { AxiosError } from "axios";
+import { IArticle, IBaseArticle, InitialArticle } from "../ts/article";
 import StateHandler from "../components/StateHandler/StateHandler";
 import { useLocation } from "react-router-dom";
 import EditArticleModal from "../components/Admin/EditArticleModal";
 import DeleteArticleModal from "../components/Admin/DeleteArticleModal";
 import Pagination from "../components/Pagination";
-import { UserContext } from "../components/Context/UserContext";
-import { ToasterContext } from "../components/Context/ToasterContext";
+import { useArticles } from "../Hooks/useArticles";
 
 function MainPage() {
-  // Context
-  const { user } = useContext(UserContext);
-  const { addToast } = useContext(ToasterContext);
-
-  // Use Location
+  // Hooks declaration
   const location = useLocation();
+  const {
+    error,
+    loading,
+    articles,
+    totalArticles,
+    getArticles,
+    editArticle,
+    deleteArticle,
+  } = useArticles();
 
   // States
-  const [articles, setArticles] = useState<IArticle[]>([]);
-  const [article, setArticle] = useState<IArticle | null>(null);
-  const [totalArticles, setTotalArticles] = useState<number>(0);
-
-  const [error, setError] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
-
+  const [article, setArticle] = useState<IBaseArticle | IArticle>(
+    InitialArticle
+  );
   const [showDeleteArticleModal, setShowDeleteArticleModal] =
     useState<boolean>(false);
   const [showEditArticleModal, setShowEditArticleModal] =
@@ -39,88 +38,10 @@ function MainPage() {
   const currentPage = parseInt(page);
   const articlesPerPage = parseInt(limit);
 
-  // Manage articles
-  const deleteArticle = async () => {
-    if (!article) {
-      console.error("No article!");
-      return;
-    }
-
-    const { id } = article;
-
-    try {
-      await axios.delete(import.meta.env.VITE_BASE_URL + "/articles/" + id, {
-        headers: {
-          Authorization: "Bearer " + user?.token,
-        },
-      });
-
-      setArticles(articles.filter((x) => x.id !== id));
-      addToast("Successfully deleted article", 1);
-      setShowDeleteArticleModal(false);
-    } catch (error) {
-      const err = error as AxiosError;
-      addToast(err.message, -1);
-      console.error("Error in deleting article:", error);
-    }
-  };
-
-  const editArticle = async (editedArticle: IArticle) => {
-    try {
-      await axios.put(
-        import.meta.env.VITE_BASE_URL + "/articles/" + editedArticle.id,
-        editedArticle,
-        {
-          headers: {
-            Authorization: "Bearer " + user?.token,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      setArticles(
-        articles.map((article) =>
-          article.id === editedArticle.id
-            ? { ...article, ...editedArticle }
-            : article
-        )
-      );
-
-      addToast("Successfully updated article", 1);
-      setShowEditArticleModal(false);
-    } catch (error) {
-      const err = error as AxiosError;
-      addToast(err.message, -1);
-      console.error("Error in updating article:", error);
-    }
-  };
-
-  // Callback wrapper for getArticles function
-  const getArticles = useCallback(async () => {
-    try {
-      setLoading(true);
-
-      const response = await axios.get(
-        import.meta.env.VITE_BASE_URL + "/articles",
-        {
-          params: { page: currentPage, limit: articlesPerPage },
-        }
-      );
-
-      setArticles(response.data.items);
-      setTotalArticles(response.data.total);
-    } catch (error: unknown) {
-      setError(true);
-      console.error("Error in getting articles:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, articlesPerPage, setArticles, setTotalArticles]);
-
   // Hooks
   useEffect(() => {
-    getArticles();
-  }, [getArticles, currentPage]);
+    getArticles(currentPage, articlesPerPage);
+  }, [getArticles, currentPage, articlesPerPage]);
 
   const Modals = () => {
     return (
@@ -134,7 +55,9 @@ function MainPage() {
         <DeleteArticleModal
           showModal={showDeleteArticleModal}
           setShowModal={setShowDeleteArticleModal}
-          deleteArticle={deleteArticle}
+          deleteArticle={() => {
+            deleteArticle(article.id);
+          }}
         />
       </>
     );
@@ -143,23 +66,27 @@ function MainPage() {
   return (
     <>
       <Modals />
-      <div className="flex flex-col p-4">
+      <div className="flex h-full flex-col p-4">
         <h1 className="font-bold text-xl px-4 mb-4">
           Articles ({totalArticles})
         </h1>
         <StateHandler state={{ error, loading, length: articles.length }}>
           <StateHandler.Loading>
-            <div className="text-center font-bold">Loading...</div>
+            <div className="flex flex-col justify-center items-center h-full font-bold">
+              Loading...
+            </div>
           </StateHandler.Loading>
           <StateHandler.Error>
-            <div className="flex flex-col items-center">
-              <h1 className="font-bold mb-4">Error in getting articles!</h1>
+            <div className="flex flex-1 justify-center flex-col items-center">
+              <span className="font-bold mb-4">Error in getting articles!</span>
               <button
                 className="button-md bg-gray-50 border border-gray-100"
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  getArticles(currentPage, articlesPerPage);
+                }}
               >
                 <span className="ic">refresh</span>
-                Reload page
+                Try again
               </button>
             </div>
           </StateHandler.Error>

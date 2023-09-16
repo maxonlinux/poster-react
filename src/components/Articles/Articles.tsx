@@ -1,4 +1,4 @@
-import { IArticle } from "../../ts/interfaces";
+import { IArticle } from "../../ts/article";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../Context/UserContext";
@@ -38,7 +38,7 @@ function Articles({
 
   // Renders only if user is admin
   const AdminButtons = ({ article }: { article: IArticle }) => {
-    if (!user?.isAdmin) return;
+    if (!user?.role) return;
     return (
       <div className="flex gap-2">
         <button
@@ -69,15 +69,21 @@ function Articles({
   const ArticlesMap = () =>
     articles.map((article) => (
       <div
-        className="flex flex-col gap-4 p-4 w-full border border-gray-200 rounded-xl"
+        className="flex flex-col gap-3 p-4 w-full border border-gray-200 rounded-xl"
         key={article.id}
       >
-        <h2 className="font-semibold break-words">
-          {truncate(article.title, 30)}
-        </h2>
+        <div>
+          <h2 className="font-semibold break-words">
+            {truncate(article.title, 30)}
+          </h2>
+          <span className="text-xs">
+            {new Date(article.created_at).toLocaleDateString()}{" "}
+            {new Date(article.created_at).toLocaleTimeString()}
+          </span>
+        </div>
         <div className="flex flex-col h-full justify-between">
           <div className="mb-4 break-words">
-            {truncate(article.content, 100)}{" "}
+            {article.description}{" "}
             <div className="inline-block">
               <button
                 className="font-semibold flex items-center gap-1"

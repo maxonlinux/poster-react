@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
-import { IArticle } from "../ts/interfaces";
+import { IArticle } from "../ts/article";
 import Comments from "../components/Comments/Comments";
 import axios from "axios";
 import StateHandler from "../components/StateHandler/StateHandler";
@@ -32,6 +32,24 @@ function ArticlePage() {
     }
   }, [id]);
 
+  const Article = () => {
+    if (!article) return;
+    return (
+      <div className="flex flex-col gap-4 p-4 w-full border border-gray-200 rounded-xl">
+        <div>
+          <h1 className="font-semibold break-words">{article.title}</h1>
+          <span className="text-xs text-gray-500">
+            {new Date(article.created_at).toLocaleDateString()}{" "}
+            {new Date(article.created_at).toLocaleTimeString()}
+          </span>
+        </div>
+        <div className="flex flex-col h-full justify-between">
+          <div className="mb-4 break-words">{article.content}</div>
+        </div>
+      </div>
+    );
+  };
+
   // Hooks
   useEffect(() => {
     getArticle();
@@ -61,12 +79,7 @@ function ArticlePage() {
           </div>
         </StateHandler.Empty>
         <StateHandler.Success>
-          <div className="flex flex-col gap-4 p-4 w-full border border-gray-200 rounded-xl">
-            <h1 className="font-semibold break-words">{article?.title}</h1>
-            <div className="flex flex-col h-full justify-between">
-              <div className="mb-4 break-words">{article?.content}</div>
-            </div>
-          </div>
+          <Article />
           <Comments articleId={id} />
         </StateHandler.Success>
       </StateHandler>

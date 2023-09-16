@@ -1,9 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { IToast } from "../../ts/interfaces";
+import { IToast } from "../../ts/toaster";
 import { createPortal } from "react-dom";
 import { ToasterContext } from "../Context/ToasterContext";
 
 function Toaster() {
+  // States
   const { toasts, setToasts } = useContext(ToasterContext);
   const [localToasts, setLocalToasts] = useState<IToast[]>([]);
 
@@ -19,13 +20,15 @@ function Toaster() {
     if (toasts.length > 0) {
       setLocalToasts([...localToasts, ...toasts]);
       setToasts([]);
-      toasts.forEach((_, i) => {
+      toasts.forEach((_: IToast, i: number) => {
         setTimeout(() => {
           closeToast(i);
         }, 3000);
       });
     }
   }, [toasts, setToasts, localToasts]);
+
+  if (!localToasts.length) return;
 
   return createPortal(
     <div className="fixed right-0 top-0 flex max-w-full flex-col gap-2 p-4 z-50 font-[500]">

@@ -1,36 +1,36 @@
-import { useCallback, useContext, useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
+import { useEffect, useState } from "react";
 import Pagination from "../components/Pagination";
-import { IArticle } from "../ts/interfaces";
+import { IArticle, IBaseArticle, InitialArticle } from "../ts/article";
 import StateHandler from "../components/StateHandler/StateHandler";
 import { useLocation } from "react-router-dom";
 import CreateArticleModal from "../components/Admin/CreateArticleModal";
 import EditArticleModal from "../components/Admin/EditArticleModal";
 import DeleteArticleModal from "../components/Admin/DeleteArticleModal";
 import ArticlesTable from "../components/Admin/ArticlesTable";
-import { ToasterContext } from "../components/Context/ToasterContext";
-import { UserContext } from "../components/Context/UserContext";
+import { useArticles } from "../Hooks/useArticles";
 
 function AdminPage() {
-  // Context
-  const { user } = useContext(UserContext);
-  const { addToast } = useContext(ToasterContext);
-
-  // Use Location
+  // Hooks declarations
   const location = useLocation();
+  const {
+    error,
+    loading,
+    articles,
+    totalArticles,
+    getArticles,
+    createArticle,
+    editArticle,
+    deleteArticle,
+  } = useArticles();
 
   // States
-  const [articles, setArticles] = useState<IArticle[]>([]);
-  const [totalArticles, setTotalArticles] = useState(0);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
   const [showCreateArticleModal, setShowCreateArticleModal] = useState(false);
   const [showDeleteArticleModal, setShowDeleteArticleModal] = useState(false);
   const [showEditArticleModal, setShowEditArticleModal] = useState(false);
 
-  const [article, setArticle] = useState<IArticle | null>(null);
+  const [article, setArticle] = useState<IArticle | IBaseArticle>(
+    InitialArticle
+  );
 
   // Constants
   const queryParams = new URLSearchParams(location.search);
@@ -40,111 +40,10 @@ function AdminPage() {
   const currentPage = parseInt(page);
   const articlesPerPage = parseInt(limit);
 
-  // Manage articles
-  const deleteArticle = async () => {
-    if (!article) {
-      console.error("No article!");
-      return;
-    }
-
-    const { id } = article;
-    try {
-      await axios.delete(import.meta.env.VITE_BASE_URL + "/articles/" + id, {
-        headers: {
-          Authorization: "Bearer " + user?.token,
-        },
-      });
-
-      setArticles(articles.filter((x) => x.id !== id));
-      addToast("Successfully deleted article", 1);
-      setShowDeleteArticleModal(false);
-    } catch (error) {
-      const err = error as AxiosError;
-      addToast(err.message, -1);
-      console.error("Error in deleting article:", error);
-    }
-  };
-
-  const editArticle = async (editedArticle: Partial<IArticle>) => {
-    try {
-      await axios.put(
-        import.meta.env.VITE_BASE_URL + "/articles/" + editedArticle.id,
-        editedArticle,
-        {
-          headers: {
-            Authorization: "Bearer " + user?.token,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      setArticles(
-        articles.map((article) =>
-          article.id === editedArticle.id
-            ? { ...article, ...editedArticle }
-            : article
-        )
-      );
-
-      addToast("Successfully updated article", 1);
-      setShowEditArticleModal(false);
-    } catch (error) {
-      const err = error as AxiosError;
-      addToast(err.message, -1);
-      console.error("Error in updating article:", error);
-    }
-  };
-
-  const createArticle = async (newArticle: Partial<IArticle>) => {
-    try {
-      await axios.post(
-        import.meta.env.VITE_BASE_URL + "/articles",
-        {
-          title: newArticle.title,
-          content: newArticle.content,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + user?.token,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      setShowCreateArticleModal(false);
-      await getArticles();
-      addToast("Successfully created article", 1);
-    } catch (error) {
-      const err = error as AxiosError;
-      addToast(err.message, -1);
-      console.error("Error while creating article:", error);
-    }
-  };
-
-  // Get Articles
-  const getArticles = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        import.meta.env.VITE_BASE_URL + "/articles",
-        {
-          params: { page: currentPage, limit: articlesPerPage },
-        }
-      );
-      setArticles(response.data.items);
-      setTotalArticles(response.data.total);
-    } catch (error: unknown) {
-      setError(true);
-      console.error("Error in getting articles:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [articlesPerPage, currentPage, setArticles, setTotalArticles]);
-
   // Hooks
   useEffect(() => {
-    getArticles();
-  }, [getArticles]);
+    getArticles(currentPage, articlesPerPage);
+  }, [getArticles, currentPage, articlesPerPage]);
 
   // Modals component
   const Modals = () => {
@@ -164,7 +63,9 @@ function AdminPage() {
         <DeleteArticleModal
           showModal={showDeleteArticleModal}
           setShowModal={setShowDeleteArticleModal}
-          deleteArticle={deleteArticle}
+          deleteArticle={() => {
+            deleteArticle(article.id);
+          }}
         />
       </>
     );
@@ -174,16 +75,6 @@ function AdminPage() {
     <>
       <Modals />
       <div className="h-full">
-        {/* <div className="flex flex-col gap-2 h-full w-full max-w-[15rem] border-r border-gray-100 p-4">
-        <button className="flex gap-2 bg-gray-100 rounded-lg px-4 py-2 font-semibold">
-          <span className="ic">article</span>
-          Articles
-        </button>
-        <button className="flex gap-2 bg-gray-100 rounded-lg px-4 py-2 font-semibold">
-          <span className="ic">add</span>
-          New article
-        </button>
-      </div> */}
         <div className="flex flex-col p-4">
           <h1 className="font-bold text-xl px-4 mb-4">
             Manage articles ({totalArticles})
@@ -216,8 +107,8 @@ function AdminPage() {
                   </div>
                 </StateHandler.Error>
                 <StateHandler.Empty>
-                  <div className="flex flex-col items-center">
-                    <h1 className="font-bold mb-4">Empty...</h1>
+                  <div className="flex flex-col flex-1 justify-center items-center">
+                    <h1 className="font-bold">Empty...</h1>
                   </div>
                 </StateHandler.Empty>
                 <StateHandler.Success>

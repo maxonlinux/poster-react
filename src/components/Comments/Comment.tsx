@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
-import { IComment } from "../../ts/interfaces";
+import { IComment } from "../../ts/comment";
 import Modal from "../Modal";
 import { UserContext } from "../Context/UserContext";
 
 //Props Interface
 interface IProps {
-  onDeleteComment: (id: number) => Promise<true | undefined>;
+  onDeleteComment: (id: number) => Promise<void>;
   comment: IComment;
 }
 
@@ -18,15 +18,14 @@ function Comment({ onDeleteComment, comment }: IProps) {
 
   // Handlers
   const handleDeleteComment = async (id: number) => {
-    const success = await onDeleteComment(id);
-    if (!success) return;
+    await onDeleteComment(id);
 
     setShowDeleteModal(false);
   };
 
   // Renders only if user is admin
   const DeleteButton = () => {
-    if (!user?.isAdmin) return;
+    if (!user) return;
     return (
       <button
         className="button-sm text-red-400 bg-red-50"
@@ -61,12 +60,19 @@ function Comment({ onDeleteComment, comment }: IProps) {
         </div>
       </Modal>
       <div className="flex flex-col py-4">
-        <span className="flex gap-2 items-center text-xs text-gray-500">
-          {new Date(comment.createdAt).toLocaleDateString()}{" "}
-          {new Date(comment.createdAt).toLocaleTimeString()}
-        </span>
-        <div className="flex items-center gap-1">
-          <span className="ic">keyboard_arrow_right</span> {comment.content}
+        <div className="flex items-center gap-4">
+          <img
+            className="h-8 w-8 bg-gray-200 rounded-full flex-shrink-0"
+            src="https://i.pravatar.cc/300"
+            alt="Avatar"
+          />
+          <div>
+            <span className="flex gap-2 items-center text-xs text-gray-500">
+              {new Date(comment.created_at).toLocaleDateString()}{" "}
+              {new Date(comment.created_at).toLocaleTimeString()}
+            </span>
+            <div className="flex items-center gap-1">{comment.content}</div>
+          </div>
         </div>
       </div>
       <DeleteButton />
