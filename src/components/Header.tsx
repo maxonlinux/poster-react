@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { MouseEventHandler, useContext } from "react";
-import { UserContext } from "../App";
+import { UserContext } from "./Context/UserContext";
 
 function Header({ handleLogOut }: { handleLogOut: MouseEventHandler }) {
-  const user = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   // Conditionally render Sign Up or Sign In button
   const AuthButton = () => {
