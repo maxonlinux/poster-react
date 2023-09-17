@@ -4,6 +4,7 @@ import { IArticle, IBaseArticle } from '../types/article';
 import { ToastStatus } from '../types/toaster'
 import { ToasterContext } from '../components/Context/ToasterContext'
 import { UserContext } from '../components/Context/UserContext';
+import { TError } from '../types/general';
 
 export const useArticles = () => {
     // Context
@@ -53,7 +54,7 @@ export const useArticles = () => {
                 },
                 {
                     headers: {
-                        Authorization: 'Bearer ' + user?.token,
+                        Authorization: user?.token,
                         'Content-Type': 'application/json',
                     },
                 }
@@ -61,18 +62,18 @@ export const useArticles = () => {
 
             addToast('Successfully created article', ToastStatus.Success);
         } catch (error) {
-            const err = error as AxiosError;
-            addToast(err.message, ToastStatus.Error);
+            const err = error as TError;
+            addToast(err.response.data.error, ToastStatus.Error);
             console.error('Error while creating article:', error);
         }
     };
 
     // Delete article
-    const deleteArticle = async (id: number) => {
+    const deleteArticle = async (id: string) => {
         try {
             await axios.delete(import.meta.env.VITE_BASE_URL + '/articles/' + id, {
                 headers: {
-                    Authorization: 'Bearer ' + user?.token,
+                    Authorization: user?.token,
                 },
             });
 
@@ -89,11 +90,11 @@ export const useArticles = () => {
     const editArticle = async (editedArticle: IBaseArticle) => {
         try {
             await axios.put(
-                import.meta.env.VITE_BASE_URL + '/articles/' + editedArticle.id,
+                import.meta.env.VITE_BASE_URL + '/articles/' + editedArticle._id,
                 editedArticle,
                 {
                     headers: {
-                        Authorization: 'Bearer ' + user?.token,
+                        Authorization: user?.token,
                         'Content-Type': 'application/json',
                     },
                 }
@@ -101,7 +102,7 @@ export const useArticles = () => {
 
             setArticles((prevArticles) =>
                 prevArticles.map((article) =>
-                    article.id === editedArticle.id
+                    article._id === editedArticle._id
                         ? { ...article, ...editedArticle }
                         : article
                 )

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import axios, { AxiosError } from "axios";
-import { IUserResponse, TUser } from "../types/user";
+import { IUser, TUser } from "../types/user";
 import { ICredentials } from "../types/credentials";
 import { ToastStatus } from "../types/toaster";
 import { ToasterContext } from "../components/Context/ToasterContext";
@@ -15,23 +15,23 @@ export const useAuth = () => {
     const logIn = async (data: ICredentials) => {
         try {
             const response = await axios.post(
-                import.meta.env.VITE_BASE_URL + "/users/token",
+                import.meta.env.VITE_BASE_URL + "/auth/signin",
                 data,
                 {
                     headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Content-Type": "application/json",
                     },
                 }
             );
 
-            const { access_token, user_id, status, username }: IUserResponse =
-                response.data;
+            const { token, id, role, username }: IUser =
+                response.data.user;
 
             const userData: TUser = {
-                id: user_id,
-                username: username,
-                token: access_token,
-                role: status,
+                id,
+                username,
+                token,
+                role,
             };
 
             setUser(userData);

@@ -32,7 +32,7 @@ function Article({ article, getArticles }: IProps) {
 
   // Handlers
   const handleReadMore = () => {
-    navigate("/articles/" + article.id);
+    navigate("/articles/" + article._id);
   };
 
   // Modals component
@@ -48,7 +48,7 @@ function Article({ article, getArticles }: IProps) {
         showModal={showDeleteModal}
         setShowModal={setShowDeleteModal}
         getArticles={getArticles}
-        id={article.id}
+        id={article._id}
       />
     </>
   );
@@ -85,15 +85,15 @@ function Article({ article, getArticles }: IProps) {
       <Modals />
       <div
         className="flex flex-col gap-3 p-4 w-full border border-gray-200 rounded-xl"
-        key={article.id}
+        key={article._id}
       >
         <div>
           <h2 className="font-semibold break-words">
             {truncate(article.title, 30)}
           </h2>
           <span className="text-xs">
-            {new Date(article.created_at).toLocaleDateString()}{" "}
-            {new Date(article.created_at).toLocaleTimeString()}
+            {new Date(article.createdAt).toLocaleDateString()}{" "}
+            {new Date(article.createdAt).toLocaleTimeString()}
           </span>
         </div>
         <div className="flex flex-col h-full justify-between">

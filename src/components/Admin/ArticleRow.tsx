@@ -26,7 +26,7 @@ function ArticleRow({ article, getArticles }: IProps) {
         showModal={showDeleteModal}
         setShowModal={setShowDeleteModal}
         getArticles={getArticles}
-        id={article.id}
+        id={article._id}
       />
     </>
   );
@@ -35,72 +35,78 @@ function ArticleRow({ article, getArticles }: IProps) {
     <>
       <Modals />
       <tr
-        className="[&>td]:py-4 [&>td]:px-2 max-sm:flex max-sm:flex-col max-sm:truncate max-sm:my-4
-        [&>td]:max-sm:before:text-sm [&>td]:max-sm:before:text-black [&>td]:max-sm:before:mr-auto
-        [&>td]:max-sm:flex [&>td]:max-sm:gap-2 [&>td]:max-sm:max-w-none [&>td]:max-sm:w-full
-        [&>td]:max-sm:px-4 [&>td]:max-sm:py-3 [&>td]:max-sm:break-words [&>td]:max-sm:items-center
-        [&>td]:max-sm:border-x [&>td]:max-sm:border-b [&>td]:max-sm:border-gray-100"
+        className="[&>td]:py-4 [&>td]:px-2 max-md:flex max-md:flex-col max-md:truncate max-md:my-4
+        [&>td]:max-md:before:text-sm [&>td]:max-md:before:text-black [&>td]:max-md:before:mr-auto
+        [&>td]:max-md:flex [&>td]:max-md:gap-2 [&>td]:max-md:max-w-none [&>td]:max-md:w-full
+        [&>td]:max-md:px-4 [&>td]:max-md:py-3 [&>td]:max-md:break-words [&>td]:max-md:items-center
+        [&>td]:max-md:border-x [&>td]:max-md:border-b [&>td]:max-md:border-gray-100"
       >
         <td
           className="w-[0%] text-xs text-gray-700
-        max-sm:before:content-['Created:'] max-sm:rounded-t-lg max-sm:border-t"
+        max-md:before:content-['Created:'] max-md:rounded-t-lg max-md:border-t"
         >
-          <span className="sm:block">
-            {new Date(article.created_at).toLocaleDateString()}
+          <span className="md:block">
+            {new Date(article.createdAt).toLocaleDateString()}
           </span>
-          <span className="sm:block">
-            {new Date(article.created_at).toLocaleTimeString()}
+          <span className="md:block">
+            {new Date(article.createdAt).toLocaleTimeString()}
           </span>
         </td>
         <td
           className="w-[0%] text-xs text-gray-700
-        max-sm:before:content-['Updated:']"
+        max-md:before:content-['Updated:']"
         >
-          <span className="sm:block">
-            {new Date(article.updated_at).toLocaleDateString()}
+          <span className="md:block">
+            {new Date(article.updatedAt).toLocaleDateString()}
           </span>
-          <span className="sm:block">
-            {new Date(article.updated_at).toLocaleTimeString()}
+          <span className="md:block">
+            {new Date(article.updatedAt).toLocaleTimeString()}
           </span>
         </td>
         <td
-          className="max-w-[150px] truncate
-        max-sm:before:content-['Title:']"
+          className="max-w-0 truncate
+        max-md:before:content-['Title:']"
         >
           <span className="truncate">{article.title}</span>
         </td>
         <td
-          className="max-w-[150px] truncate
-        max-sm:before:content-['Content:']"
+          className="max-w-0 truncate
+        max-md:before:content-['Description:']"
+        >
+          <span className="truncate">{article.description}</span>
+        </td>
+        <td
+          className="max-w-0 truncate
+        max-md:before:content-['Content:']"
         >
           <span className="truncate">{article.content}</span>
         </td>
         <td
           className="w-[0%]
-        max-sm:rounded-b-lg max-sm:pb-4"
+        max-md:rounded-b-lg max-md:pb-4"
         >
           <div className="flex gap-2 justify-end w-full">
             <button
               className="flex items-center gap-2 py-2 px-4 rounded-md bg-gray-50 text-gray-700
-            max-sm:py-2 max-sm:px-4"
+            max-md:py-2 max-md:px-4"
               onClick={() => setShowEditModal(true)}
             >
               <span className="ic text-xl">edit</span>
               <span
                 className="font-bold
-                sm:hidden"
+                md:hidden"
               >
                 Edit
               </span>
             </button>
             <button
               className="flex items-center gap-2 py-2 px-4 rounded-md bg-red-50 text-red-400
-            max-sm:py-2 max-sm:px-4"
+            max-md:py-2 max-md:px-4"
               onClick={() => setShowDeleteModal(true)}
             >
               <span className="ic text-xl">delete</span>
               <span
-                className="sm:hidden
+                className="md:hidden
               font-bold"
               >
                 Delete

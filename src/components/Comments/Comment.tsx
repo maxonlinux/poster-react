@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
 import { IComment } from "../../types/comment";
-import Modal from "../Modal";
 import { UserContext } from "../Context/UserContext";
 import { useComments } from "../../Hooks/useComments";
+import Modal from "../Modal";
 
 //Props Interface
 interface IProps {
@@ -44,7 +44,7 @@ function Comment({ comment, getComments }: IProps) {
           <button
             className="button-sm bg-red-100 text-red-400"
             onClick={async () => {
-              await deleteComment(comment.id);
+              await deleteComment(comment._id);
               getComments();
               setShowDeleteModal(false);
             }}
@@ -67,10 +67,14 @@ function Comment({ comment, getComments }: IProps) {
             alt="Avatar"
           />
           <div className="min-w-0">
-            <span className="text-xs text-gray-500">
-              {new Date(comment.created_at).toLocaleDateString()}{" "}
-              {new Date(comment.created_at).toLocaleTimeString()}
-            </span>
+            <div className="text-xs text-gray-500">
+              by{" "}
+              <span className="font-medium text-black">{comment.username}</span>
+            </div>
+            <div className="text-xs text-gray-500">
+              <span>{new Date(comment.createdAt).toLocaleDateString()}</span>{" "}
+              <span>{new Date(comment.createdAt).toLocaleTimeString()}</span>
+            </div>
             <div className="break-words">{comment.content}</div>
           </div>
         </div>

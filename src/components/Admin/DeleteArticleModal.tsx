@@ -6,7 +6,7 @@ interface IProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   getArticles: () => void;
-  id: number;
+  id: string;
 }
 
 function DeleteArticleModal({

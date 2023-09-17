@@ -1,24 +1,29 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { useComments } from "../../Hooks/useComments";
+import { IBaseComment, InitialComment } from "../../types/comment";
 
-function AddComment({
+function CreateComment({
   articleId,
   getComments,
 }: {
-  articleId: number;
-  getComments: () => Promise<void>;
+  articleId: string;
+  getComments: () => void;
 }) {
   // States
-  const [comment, setComment] = useState<string>("");
+  const [comment, setComment] = useState<IBaseComment>(InitialComment);
   const [isLeaveCommentDisabled, setIsLeaveCommentDisabled] =
     useState<boolean>(true);
 
   // Declare hooks
-  const { leaveComment } = useComments();
+  const { createComment } = useComments();
+
+  useEffect(() => {
+    setComment({ ...comment, articleId });
+  }, []);
 
   // Hooks
   useEffect(() => {
-    if (!comment.trim()) {
+    if (!comment.content.trim()) {
       setIsLeaveCommentDisabled(true);
     } else {
       setIsLeaveCommentDisabled(false);
@@ -26,8 +31,14 @@ function AddComment({
   }, [comment, setIsLeaveCommentDisabled]);
 
   // Two-way binding
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setComment(e.target.value);
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setComment({
+      ...comment,
+      [name]: value,
+    });
   };
 
   return (
@@ -36,7 +47,7 @@ function AddComment({
         className="p-4 border border-gray-200 rounded-lg h-full appearance-none resize-none w-full"
         placeholder="Add comment..."
         name="content"
-        value={comment}
+        value={comment.content}
         onChange={handleChange}
       />
       <button
@@ -46,9 +57,9 @@ function AddComment({
         disabled={isLeaveCommentDisabled}
         onClick={async () => {
           setIsLeaveCommentDisabled(true);
-          await leaveComment(comment, articleId);
+          await createComment(comment);
           getComments();
-          setComment("");
+          setComment(InitialComment);
         }}
       >
         Leave comment
@@ -58,4 +69,4 @@ function AddComment({
   );
 }
 
-export default AddComment;
+export default CreateComment;

@@ -11,7 +11,7 @@ function Articles({ articles, getArticles }: IProps) {
   // Mapped articles component
   const ArticlesMap = () =>
     articles.map((article) => (
-      <Article key={article.id} article={article} getArticles={getArticles} />
+      <Article key={article._id} article={article} getArticles={getArticles} />
     ));
   return (
     <>

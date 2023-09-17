@@ -7,7 +7,6 @@ import { useArticle } from "../Hooks/useArticle";
 function ArticlePage() {
   // Get ID from URL
   const { id } = useParams<string>();
-  const articleId = parseInt(id || "");
 
   // Declare hooks
   const navigate = useNavigate();
@@ -21,8 +20,8 @@ function ArticlePage() {
         <div>
           <h1 className="font-semibold break-words">{article.title}</h1>
           <span className="text-xs text-gray-500">
-            {new Date(article.created_at).toLocaleDateString()}{" "}
-            {new Date(article.created_at).toLocaleTimeString()}
+            {new Date(article.createdAt).toLocaleDateString()}{" "}
+            {new Date(article.createdAt).toLocaleTimeString()}
           </span>
         </div>
         <div className="flex flex-col h-full justify-between">
@@ -35,8 +34,8 @@ function ArticlePage() {
   // Hooks
   useEffect(() => {
     if (!id) return;
-    getArticle(articleId);
-  }, [articleId]);
+    getArticle(id);
+  }, [id]);
 
   return (
     <div className="flex flex-col h-full px-4">
@@ -63,7 +62,7 @@ function ArticlePage() {
         </StateHandler.Empty>
         <StateHandler.Success>
           <Article />
-          <Comments articleId={articleId} />
+          {id ? <Comments articleId={id} /> : null}
         </StateHandler.Success>
       </StateHandler>
     </div>

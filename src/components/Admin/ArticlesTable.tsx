@@ -11,7 +11,7 @@ function ArticlesTable({ articles, getArticles }: IProps) {
   const ArticlesMap = () =>
     articles.map((article) => (
       <ArticleRow
-        key={article.id}
+        key={article._id}
         article={article}
         getArticles={getArticles}
       />
@@ -21,11 +21,11 @@ function ArticlesTable({ articles, getArticles }: IProps) {
     <>
       <table
         className="w-full responsive-table
-      max-sm:block"
+      max-md:block"
       >
         <thead
           className="text-left
-        max-sm:hidden"
+        max-md:hidden"
         >
           <tr
             className="border-b border-gray-200 text-gray-500
@@ -34,13 +34,14 @@ function ArticlesTable({ articles, getArticles }: IProps) {
             <th>Created</th>
             <th>Updated</th>
             <th>Title</th>
+            <th>Description</th>
             <th>Content</th>
           </tr>
         </thead>
         <tbody
           className="text-left
-          sm:divide-y sm:divide-gray-200
-          max-sm:block"
+          md:divide-y md:divide-gray-200
+          max-md:block"
         >
           <ArticlesMap />
         </tbody>

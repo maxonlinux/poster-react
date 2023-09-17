@@ -9,7 +9,7 @@ export const useArticle = () => {
     const [error, setError] = useState<boolean>(false);
 
     // Get one article
-    const getArticle = useCallback(async (id: number) => {
+    const getArticle = useCallback(async (id: string) => {
         try {
             const response = await axios.get<IArticle>(
                 import.meta.env.VITE_BASE_URL + "/articles/" + id

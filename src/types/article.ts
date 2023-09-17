@@ -1,18 +1,18 @@
 export enum InitialArticle {
-    id = NaN,
+    _id = "",
     title = "",
     description = "",
     content = ""
 }
 
 export interface IBaseArticle {
-    id: number;
+    _id: string;
     title: string;
     description: string;
     content: string;
 }
 
 export interface IArticle extends IBaseArticle {
-    created_at: string;
-    updated_at: string;
+    createdAt: string;
+    updatedAt: string;
 }

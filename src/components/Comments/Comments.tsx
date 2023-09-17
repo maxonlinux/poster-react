@@ -1,37 +1,46 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import StateHandler from "../StateHandler/StateHandler";
 import Comment from "./Comment";
-import AddComment from "./AddComment";
+import CreateComment from "./CreateComment";
 import { useComments } from "../../Hooks/useComments";
 
-function Comments({ articleId }: { articleId: number }) {
+function Comments({ articleId }: { articleId: string }) {
   // Get comments
   const { comments, loading, error, getComments } = useComments();
 
-  // Manage comments
+  // Handlers
+  const handleGetComments = useCallback(() => {
+    getComments(articleId);
+  }, [articleId]);
 
   // Hooks
   useEffect(() => {
-    getComments(articleId);
-  }, [getComments]);
+    handleGetComments();
+  }, [handleGetComments]);
+
+  const CommentsMap = () =>
+    comments.map((comment) => (
+      <Comment
+        key={comment._id}
+        comment={comment}
+        getComments={handleGetComments}
+      />
+    ));
 
   return (
     <div className="flex flex-col gap-4 py-4">
       <span className="font-bold ml-3">Comments ({comments.length}):</span>
-      <AddComment
-        articleId={articleId}
-        getComments={() => getComments(articleId)}
-      />
+      <CreateComment articleId={articleId} getComments={handleGetComments} />
       <StateHandler state={{ error, loading, length: comments.length }}>
         <StateHandler.Loading>
-          <div className="text-center font-bold p-4">Loading...</div>;
+          <div className="text-center font-bold p-4">Loading...</div>
         </StateHandler.Loading>
         <StateHandler.Error>
           <h1 className="font-bold mb-4">Error in getting comments!</h1>
           <div>
             <button
               className="button-md bg-gray-50 border border-gray-100"
-              onClick={() => getComments(articleId)}
+              onClick={handleGetComments}
             >
               <span className="ic">refresh</span>
               Refresh comments
@@ -45,13 +54,7 @@ function Comments({ articleId }: { articleId: number }) {
         </StateHandler.Empty>
         <StateHandler.Success>
           <div className="flex flex-col px-3">
-            {comments.map((comment) => (
-              <Comment
-                key={comment.id}
-                comment={comment}
-                getComments={() => getComments(articleId)}
-              />
-            ))}
+            <CommentsMap />
           </div>
         </StateHandler.Success>
       </StateHandler>
