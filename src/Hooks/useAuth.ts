@@ -1,16 +1,17 @@
 import { useContext } from "react";
 import axios, { AxiosError } from "axios";
-import { IUserResponse, TUser } from "../ts/user";
-import { ICredentials } from "../ts/credentials";
-import { ToastStatus } from "../ts/toaster";
+import { IUserResponse, TUser } from "../types/user";
+import { ICredentials } from "../types/credentials";
+import { ToastStatus } from "../types/toaster";
 import { ToasterContext } from "../components/Context/ToasterContext";
 import { UserContext } from "../components/Context/UserContext";
 
 export const useAuth = () => {
     // Context
     const { addToast } = useContext(ToasterContext)
-    const {user, setUser} = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
 
+    // Login
     const logIn = async (data: ICredentials) => {
         try {
             const response = await axios.post(
@@ -43,6 +44,7 @@ export const useAuth = () => {
         }
     };
 
+    // Logout
     const logOut = () => {
         setUser(null);
         localStorage.removeItem("user");

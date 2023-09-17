@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "./Context/UserContext";
-import { UserRole } from "../ts/user";
+import { UserRole } from "../types/user";
 import { useAuth } from "../Hooks/useAuth";
 
 function Header() {
@@ -44,11 +44,9 @@ function Header() {
     if (!user) return;
     if (user.role < UserRole.Admin) return;
     return (
-      <li>
-        <Link className="font-[600]" to={"/admin"}>
-          Manage
-        </Link>
-      </li>
+      <Link className="font-[600]" to={"/admin"}>
+        Manage
+      </Link>
     );
   };
 
@@ -60,7 +58,9 @@ function Header() {
         </Link>
         <nav>
           <ul className="flex gap-4 items-center">
-            <ManageButton />
+            <li>
+              <ManageButton />
+            </li>
             <li>
               <AuthButton />
             </li>

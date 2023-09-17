@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useState } from "react";
-import { IUserContext, TUser } from "../../ts/user";
+import { IUserContext, TUser } from "../../types/user";
 
 // Set default value for context to prevent TS errors
 export const UserContext = createContext<IUserContext>({

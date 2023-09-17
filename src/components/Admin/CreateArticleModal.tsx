@@ -2,36 +2,26 @@ import {
   ChangeEvent,
   Dispatch,
   SetStateAction,
-  SyntheticEvent,
   useEffect,
   useState,
 } from "react";
 import Modal from "../Modal";
-import { IBaseArticle } from "../../ts/article";
+import { IBaseArticle, InitialArticle } from "../../types/article";
+import { useArticles } from "../../Hooks/useArticles";
 
 interface IProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  createArticle: (newArticle: Partial<IBaseArticle>) => Promise<void>;
+  getArticles: () => void;
 }
 
-function CreateArticleModal({
-  showModal,
-  setShowModal,
-  createArticle,
-}: IProps) {
+function CreateArticleModal({ showModal, setShowModal, getArticles }: IProps) {
   //States
   const [isSubmitDisabled, setIsSibmitDisabled] = useState(true);
-  const [newArticle, setNewArticle] = useState<Partial<IBaseArticle>>({
-    title: "",
-    description: "",
-    content: "",
-  });
+  const [newArticle, setNewArticle] =
+    useState<Partial<IBaseArticle>>(InitialArticle);
 
-  const handleCreateArticle = (e: SyntheticEvent) => {
-    e.preventDefault();
-    createArticle(newArticle);
-  };
+  const { createArticle } = useArticles();
 
   // Two-way binding
   const handleChange = (
@@ -57,7 +47,12 @@ function CreateArticleModal({
     <Modal title="Create Article" openState={[showModal, setShowModal]}>
       <form
         className="flex flex-col w-full max-w-md gap-4"
-        onSubmit={handleCreateArticle}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await createArticle(newArticle);
+          setShowModal(false);
+          getArticles();
+        }}
       >
         <label htmlFor="title">
           <div className="text-xs text-gray-600 mb-2 ml-2">Title</div>
@@ -71,7 +66,7 @@ function CreateArticleModal({
           />
         </label>
         <label htmlFor="description">
-          <div className="text-xs text-gray-600 mb-2 ml-2">Content</div>
+          <div className="text-xs text-gray-600 mb-2 ml-2">Description</div>
           <textarea
             className="textarea w-full"
             placeholder="Description"

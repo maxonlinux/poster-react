@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { IToast } from "../../ts/toaster";
+import { IToast } from "../../types/toaster";
 import { createPortal } from "react-dom";
 import { ToasterContext } from "../Context/ToasterContext";
 

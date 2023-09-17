@@ -1,5 +1,5 @@
 import Modal from "../Modal";
-import { IArticle, IBaseArticle } from "../../ts/article";
+import { IArticle, IBaseArticle } from "../../types/article";
 import {
   ChangeEvent,
   Dispatch,
@@ -7,24 +7,27 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useArticles } from "../../Hooks/useArticles";
 
 interface IProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  editArticle: (editedArticle: IBaseArticle) => Promise<void>;
-  article: IArticle | IBaseArticle;
+  getArticles: () => void;
+  article: IArticle;
 }
 
 function EditArticleModal({
   showModal,
   setShowModal,
-  editArticle,
+  getArticles,
   article,
 }: IProps) {
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const [editedArticle, setEditedArticle] = useState<IBaseArticle | null>(
-    article
-  );
+  // States
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(true);
+  const [editedArticle, setEditedArticle] = useState<IBaseArticle>(article);
+
+  // Declare hooks
+  const { editArticle } = useArticles();
 
   // Two-way binding
   const handleChange = (
@@ -41,23 +44,22 @@ function EditArticleModal({
   // Hooks
   useEffect(() => {
     const isAnyFieldEmpty =
-      !editedArticle?.title.trim() ||
-      !editedArticle?.content.trim() ||
-      !editedArticle?.description.trim();
+      !editedArticle.title.trim() ||
+      !editedArticle.content.trim() ||
+      !editedArticle.description.trim();
 
     const isAnyFieldModified =
-      article?.title !== editedArticle?.title.trim() ||
-      article?.content !== editedArticle?.content.trim() ||
-      article?.description !== editedArticle?.description.trim();
+      article.title !== editedArticle.title.trim() ||
+      article.content !== editedArticle.content.trim() ||
+      article.description !== editedArticle.description.trim();
 
     if (!isAnyFieldEmpty && isAnyFieldModified) {
       setIsSubmitDisabled(false);
     } else {
       setIsSubmitDisabled(true);
     }
-  }, [article, editedArticle]);
+  }, [editedArticle]);
 
-  if (!editedArticle) return;
   return (
     <Modal openState={[showModal, setShowModal]} title="Edit Article">
       <form
@@ -65,6 +67,8 @@ function EditArticleModal({
         onSubmit={(e) => {
           e.preventDefault();
           editArticle(editedArticle);
+          setShowModal(false);
+          getArticles();
         }}
       >
         <label htmlFor="title">
@@ -79,7 +83,7 @@ function EditArticleModal({
           />
         </label>
         <label htmlFor="description">
-          <div className="text-xs text-gray-600 mb-2 ml-2">Content</div>
+          <div className="text-xs text-gray-600 mb-2 ml-2">Description</div>
           <textarea
             className="textarea w-full"
             name="description"

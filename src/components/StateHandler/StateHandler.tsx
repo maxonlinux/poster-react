@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { ResponseState } from "../../ts/general";
+import { ResponseState } from "../../types/general";
 
 // State Interface
 interface IState {

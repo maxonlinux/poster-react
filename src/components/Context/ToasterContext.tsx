@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useState } from "react";
-import { IToast, IToasterContext, ToastStatus } from "../../ts/general";
+import { IToast, IToasterContext, ToastStatus } from "../../types/toaster";
 
 // Set default context to prevent TS errors
 export const ToasterContext = createContext<IToasterContext>({

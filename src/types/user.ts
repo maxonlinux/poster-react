@@ -3,14 +3,14 @@ export enum UserRole {
     Admin = 1,
 }
 
-export type TUser = IUser | null
-
 export interface IUser {
     id: number;
     role: UserRole;
     username: string;
     token: string;
 }
+
+export type TUser = IUser | null
 
 export interface IUserContext {
     user: TUser;

@@ -1,13 +1,16 @@
-import { useState, useCallback, useContext } from 'react';
+import { useState, useContext, useCallback } from 'react';
 import axios, { AxiosError } from 'axios';
-import { IArticle, IBaseArticle } from '../ts/article';
-import {ToastStatus} from '../ts/toaster'
+import { IArticle, IBaseArticle } from '../types/article';
+import { ToastStatus } from '../types/toaster'
 import { ToasterContext } from '../components/Context/ToasterContext'
 import { UserContext } from '../components/Context/UserContext';
 
 export const useArticles = () => {
+    // Context
     const { user } = useContext(UserContext)
     const { addToast } = useContext(ToasterContext);
+
+    // States
     const [articles, setArticles] = useState<IArticle[]>([]);
     const [totalArticles, setTotalArticles] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
@@ -26,17 +29,15 @@ export const useArticles = () => {
                 );
                 setArticles(response.data.items);
                 setTotalArticles(response.data.total);
-                setLoading(false);
             } catch (error) {
                 setError(true);
-                setLoading(false);
                 console.error('Error in getting articles:', error);
                 const err = error as AxiosError;
                 addToast(err.message, ToastStatus.Error);
+            } finally {
+                setLoading(false);
             }
-        },
-        [addToast]
-    );
+        }, [])
 
     // Create article
     const createArticle = async (newArticle: Partial<IBaseArticle>) => {
@@ -75,9 +76,7 @@ export const useArticles = () => {
                 },
             });
 
-            setArticles((prevArticles) =>
-                prevArticles.filter((x) => x.id !== id)
-            );
+            setTotalArticles(totalArticles - 1)
             addToast('Successfully deleted article', ToastStatus.Success);
         } catch (error) {
             const err = error as AxiosError;
@@ -107,7 +106,6 @@ export const useArticles = () => {
                         : article
                 )
             );
-
             addToast('Successfully updated article', ToastStatus.Success);
         } catch (error) {
             const err = error as AxiosError;

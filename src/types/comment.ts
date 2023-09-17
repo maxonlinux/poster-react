@@ -1,4 +1,5 @@
 export interface IBaseComment {
+    articleId: number;
     content: string;
 }
 

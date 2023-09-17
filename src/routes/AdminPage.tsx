@@ -1,79 +1,45 @@
 import { useEffect, useState } from "react";
 import Pagination from "../components/Pagination";
-import { IArticle, IBaseArticle, InitialArticle } from "../ts/article";
 import StateHandler from "../components/StateHandler/StateHandler";
-import { useLocation } from "react-router-dom";
 import CreateArticleModal from "../components/Admin/CreateArticleModal";
-import EditArticleModal from "../components/Admin/EditArticleModal";
-import DeleteArticleModal from "../components/Admin/DeleteArticleModal";
 import ArticlesTable from "../components/Admin/ArticlesTable";
 import { useArticles } from "../Hooks/useArticles";
+import { useLocation } from "react-router-dom";
 
 function AdminPage() {
-  // Hooks declarations
-  const location = useLocation();
-  const {
-    error,
-    loading,
-    articles,
-    totalArticles,
-    getArticles,
-    createArticle,
-    editArticle,
-    deleteArticle,
-  } = useArticles();
-
   // States
-  const [showCreateArticleModal, setShowCreateArticleModal] = useState(false);
-  const [showDeleteArticleModal, setShowDeleteArticleModal] = useState(false);
-  const [showEditArticleModal, setShowEditArticleModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const [article, setArticle] = useState<IArticle | IBaseArticle>(
-    InitialArticle
-  );
+  // Declare hooks
+  const location = useLocation();
+  const { error, loading, articles, totalArticles, getArticles } =
+    useArticles();
 
   // Constants
   const queryParams = new URLSearchParams(location.search);
   const page = queryParams.get("page") ?? "1";
-  const limit = queryParams.get("limit") ?? "10";
+  const limit = queryParams.get("limit") ?? "12";
 
   const currentPage = parseInt(page);
   const articlesPerPage = parseInt(limit);
 
+  // Handlers
+  const handleGetArticles = () => {
+    getArticles(currentPage, articlesPerPage);
+  };
+
   // Hooks
   useEffect(() => {
-    getArticles(currentPage, articlesPerPage);
-  }, [getArticles, currentPage, articlesPerPage]);
-
-  // Modals component
-  const Modals = () => {
-    return (
-      <>
-        <CreateArticleModal
-          showModal={showCreateArticleModal}
-          setShowModal={setShowCreateArticleModal}
-          createArticle={createArticle}
-        />
-        <EditArticleModal
-          showModal={showEditArticleModal}
-          setShowModal={setShowEditArticleModal}
-          editArticle={editArticle}
-          article={article}
-        />
-        <DeleteArticleModal
-          showModal={showDeleteArticleModal}
-          setShowModal={setShowDeleteArticleModal}
-          deleteArticle={() => {
-            deleteArticle(article.id);
-          }}
-        />
-      </>
-    );
-  };
+    handleGetArticles();
+  }, [currentPage, articlesPerPage]);
 
   return (
     <>
-      <Modals />
+      <CreateArticleModal
+        showModal={showCreateModal}
+        setShowModal={setShowCreateModal}
+        getArticles={handleGetArticles}
+      />
       <div className="h-full">
         <div className="flex flex-col p-4">
           <h1 className="font-bold text-xl px-4 mb-4">
@@ -81,7 +47,7 @@ function AdminPage() {
           </h1>
           <button
             className="button-md bg-accent bg-opacity-20 text-accent mb-4"
-            onClick={() => setShowCreateArticleModal(true)}
+            onClick={() => setShowCreateModal(true)}
           >
             <span className="ic">add</span>
             Create article
@@ -114,9 +80,7 @@ function AdminPage() {
                 <StateHandler.Success>
                   <ArticlesTable
                     articles={articles}
-                    setArticle={setArticle}
-                    setShowEditModal={setShowEditArticleModal}
-                    setShowDeleteModal={setShowDeleteArticleModal}
+                    getArticles={handleGetArticles}
                   />
                 </StateHandler.Success>
               </StateHandler>

@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { InitialCredentials } from "../ts/credentials";
+import { InitialCredentials } from "../types/credentials";
 import { useAuth } from "../Hooks/useAuth";
 
 function LoginPage() {

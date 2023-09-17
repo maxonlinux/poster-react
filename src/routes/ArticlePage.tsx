@@ -1,37 +1,19 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
-import { IArticle } from "../ts/article";
+import { useEffect } from "react";
 import Comments from "../components/Comments/Comments";
-import axios from "axios";
 import StateHandler from "../components/StateHandler/StateHandler";
+import { useArticle } from "../Hooks/useArticle";
 
 function ArticlePage() {
   // Get ID from URL
-  const { id } = useParams();
+  const { id } = useParams<string>();
+  const articleId = parseInt(id || "");
 
-  // Navigate Hook
+  // Declare hooks
   const navigate = useNavigate();
+  const { getArticle, article, error, loading } = useArticle();
 
-  // States
-  const [article, setArticle] = useState<IArticle | null>(null);
-  const [error, setError] = useState<unknown>(null);
-  const [loading, setLoading] = useState(true);
-
-  // Get articles
-  const getArticle = useCallback(async () => {
-    try {
-      const response = await axios.get<IArticle>(
-        import.meta.env.VITE_BASE_URL + "/articles/" + id
-      );
-      setArticle(response.data);
-    } catch (error) {
-      setError(error);
-      console.error("Error in getting article:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
+  // Article Component
   const Article = () => {
     if (!article) return;
     return (
@@ -52,8 +34,9 @@ function ArticlePage() {
 
   // Hooks
   useEffect(() => {
-    getArticle();
-  }, [getArticle]);
+    if (!id) return;
+    getArticle(articleId);
+  }, [articleId]);
 
   return (
     <div className="flex flex-col h-full px-4">
@@ -80,7 +63,7 @@ function ArticlePage() {
         </StateHandler.Empty>
         <StateHandler.Success>
           <Article />
-          <Comments articleId={id} />
+          <Comments articleId={articleId} />
         </StateHandler.Success>
       </StateHandler>
     </div>

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ReactNode, useContext, useEffect } from "react";
-import { UserRole } from "../../ts/user";
+import { UserRole } from "../../types/user";
 import { UserContext } from "../Context/UserContext";
 
 interface IProps {
