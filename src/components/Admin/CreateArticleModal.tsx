@@ -1,3 +1,4 @@
+import Modal from "../Modal";
 import {
   ChangeEvent,
   Dispatch,
@@ -5,23 +6,26 @@ import {
   useEffect,
   useState,
 } from "react";
-import Modal from "../Modal";
-import { IBaseArticle, InitialArticle } from "../../types/article";
-import { useArticles } from "../../Hooks/useArticles";
+import {
+  IBaseArticle,
+  InitialArticle,
+  TCreateArticle,
+} from "../../types/article";
 
 interface IProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  getArticles: () => void;
+  createArticle: TCreateArticle;
 }
 
-function CreateArticleModal({ showModal, setShowModal, getArticles }: IProps) {
+function CreateArticleModal({
+  showModal,
+  setShowModal,
+  createArticle,
+}: IProps) {
   //States
   const [isSubmitDisabled, setIsSibmitDisabled] = useState(true);
-  const [newArticle, setNewArticle] =
-    useState<Partial<IBaseArticle>>(InitialArticle);
-
-  const { createArticle } = useArticles();
+  const [newArticle, setNewArticle] = useState<IBaseArticle>(InitialArticle);
 
   // Two-way binding
   const handleChange = (
@@ -50,11 +54,11 @@ function CreateArticleModal({ showModal, setShowModal, getArticles }: IProps) {
         onSubmit={async (e) => {
           e.preventDefault();
           await createArticle(newArticle);
+          setNewArticle(InitialArticle);
           setShowModal(false);
-          getArticles();
         }}
       >
-        <label htmlFor="title">
+        <label>
           <div className="text-xs text-gray-600 mb-2 ml-2">Title</div>
           <input
             className="input w-full"
@@ -65,7 +69,7 @@ function CreateArticleModal({ showModal, setShowModal, getArticles }: IProps) {
             onChange={handleChange}
           />
         </label>
-        <label htmlFor="description">
+        <label>
           <div className="text-xs text-gray-600 mb-2 ml-2">Description</div>
           <textarea
             className="textarea w-full"
@@ -75,7 +79,7 @@ function CreateArticleModal({ showModal, setShowModal, getArticles }: IProps) {
             onChange={handleChange}
           />
         </label>
-        <label htmlFor="content">
+        <label>
           <div className="text-xs text-gray-600 mb-2 ml-2">Content</div>
           <textarea
             className="textarea w-full"
@@ -85,9 +89,13 @@ function CreateArticleModal({ showModal, setShowModal, getArticles }: IProps) {
             onChange={handleChange}
           />
         </label>
-        <div className="flex gap-4 max-sm:flex-col">
+        <div
+          className="flex gap-4
+        max-sm:flex-col"
+        >
           <button
-            className="button-md bg-accent bg-opacity-20 text-accent w-full disabled:opacity-50"
+            className="button-md bg-accent bg-opacity-20 text-accent w-full
+            disabled:opacity-50"
             disabled={isSubmitDisabled}
           >
             Create article

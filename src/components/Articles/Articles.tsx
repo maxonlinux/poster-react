@@ -1,17 +1,27 @@
-import { IArticle } from "../../types/article";
+import { IArticle, TDeleteArticle, TEditArticle } from "../../types/article";
 import Article from "./Article";
 
 // Props Interface
 interface IProps {
   articles: IArticle[];
-  getArticles: () => void;
+  deleteArticle: TDeleteArticle;
+  editArticle: TEditArticle;
 }
 
-function Articles({ articles, getArticles }: IProps) {
+function Articles({
+  articles,
+  deleteArticle,
+  editArticle,
+}: IProps) {
   // Mapped articles component
   const ArticlesMap = () =>
     articles.map((article) => (
-      <Article key={article._id} article={article} getArticles={getArticles} />
+      <Article
+        key={article._id}
+        article={article}
+        deleteArticle={deleteArticle}
+        editArticle={editArticle}
+      />
     ));
   return (
     <>

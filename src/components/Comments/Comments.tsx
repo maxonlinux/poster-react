@@ -1,12 +1,12 @@
 import { useCallback, useEffect } from "react";
-import StateHandler from "../StateHandler/StateHandler";
+import StateHandler from "../ResponseStatusHandler/ResponseStatusHandler";
 import Comment from "./Comment";
 import CreateComment from "./CreateComment";
 import { useComments } from "../../Hooks/useComments";
 
 function Comments({ articleId }: { articleId: string }) {
   // Get comments
-  const { comments, loading, error, getComments } = useComments();
+  const { comments, status, getComments } = useComments();
 
   // Handlers
   const handleGetComments = useCallback(() => {
@@ -31,7 +31,7 @@ function Comments({ articleId }: { articleId: string }) {
     <div className="flex flex-col gap-4 py-4">
       <span className="font-bold ml-3">Comments ({comments.length}):</span>
       <CreateComment articleId={articleId} getComments={handleGetComments} />
-      <StateHandler state={{ error, loading, length: comments.length }}>
+      <StateHandler status={status}>
         <StateHandler.Loading>
           <div className="text-center font-bold p-4">Loading...</div>
         </StateHandler.Loading>

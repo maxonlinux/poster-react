@@ -1,27 +1,27 @@
 import { ChangeEvent, useState } from "react";
-import { InitialCredentials } from "../types/credentials";
+import { IRegister, InitialRegister } from "../types/credentials";
 import { useAuth } from "../Hooks/useAuth";
 import { Link } from "react-router-dom";
 
-function LoginPage() {
+function RegisterPage() {
   // States
-  const [credentials, setCredentials] = useState(InitialCredentials);
+  const [user, setRegister] = useState<IRegister>(InitialRegister);
 
   //Declare hooks
-  const { logIn } = useAuth();
+  const { register } = useAuth();
 
   // Change handler
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    setRegister({ ...user, [e.target.name]: e.target.value });
   };
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center px-4">
-      <h1 className="font-bold text-2xl mb-4">Sign In</h1>
+      <h1 className="font-bold text-2xl mb-4">Sign Up</h1>
       <form className="flex flex-col w-full max-w-md gap-4">
         <input
           className="input"
-          value={credentials.username}
+          value={user.username}
           onChange={handleChange}
           type="text"
           name="username"
@@ -30,22 +30,35 @@ function LoginPage() {
         />
         <input
           className="input"
-          value={credentials.password}
+          value={user.password}
           onChange={handleChange}
           type="password"
           name="password"
-          autoComplete="current-password"
+          autoComplete="new-password"
           placeholder="Password"
+        />
+        <input
+          className="input"
+          value={user.repeatPassword}
+          onChange={handleChange}
+          type="password"
+          name="repeatPassword"
+          autoComplete="new-password"
+          placeholder="Pepeat Password"
         />
         <button
           className="button-lg bg-accent text-white disabled:opacity-50"
-          disabled={!credentials.username || !credentials.password}
+          disabled={
+            !user.username ||
+            !user.password ||
+            user.repeatPassword !== user.password
+          }
           onClick={(e) => {
             e.preventDefault();
-            logIn(credentials);
+            register(user);
           }}
         >
-          Sign In
+          Sign Up
           <span className="ic">done</span>
         </button>
         <div className="flex w-full items-center gap-4 px-4">
@@ -55,9 +68,9 @@ function LoginPage() {
         </div>
         <Link
           className="button-lg bg-gray-50 border border-gray-100"
-          to="/register"
+          to="/login"
         >
-          Register
+          Login
           <span className="ic">east</span>
         </Link>
       </form>
@@ -65,4 +78,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;

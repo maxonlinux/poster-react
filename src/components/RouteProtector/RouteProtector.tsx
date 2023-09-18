@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { ReactNode, useContext, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { UserRole } from "../../types/user";
-import { UserContext } from "../Context/UserContext";
+import { useUser } from "../Context/UserContext";
 
 interface IProps {
   onlyForRoles: UserRole[];
@@ -10,7 +10,7 @@ interface IProps {
 
 function RouteProtector({ onlyForRoles, children }: IProps) {
   // Context
-  const { user } = useContext(UserContext);
+  const { user } = useUser();
 
   // Declare hooks
   const navigate = useNavigate();
@@ -18,10 +18,9 @@ function RouteProtector({ onlyForRoles, children }: IProps) {
   // Hooks
   useEffect(() => {
     if (!user && !onlyForRoles.includes(UserRole.Guest)) {
-      return navigate("/login");
-    }
-    if (user && !onlyForRoles.includes(user.role)) {
-      return navigate("/");
+      navigate("/login");
+    } else if (user && !onlyForRoles.includes(user.role)) {
+      navigate("/");
     }
   }, [navigate, user, onlyForRoles]);
 

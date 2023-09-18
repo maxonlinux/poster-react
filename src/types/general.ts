@@ -1,13 +1,13 @@
 import { AxiosError } from "axios";
 
-export enum ResponseState {
+export enum ResponseStatus {
     Loading,
     Error,
     Empty,
     Success
 }
 
-export type TError = AxiosError & {
+export type TResponseError = AxiosError & {
     response: {
         data: {
             error: string;

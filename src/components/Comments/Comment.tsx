@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { IComment } from "../../types/comment";
-import { UserContext } from "../Context/UserContext";
+import { useUser } from "../Context/UserContext";
 import { useComments } from "../../Hooks/useComments";
 import Modal from "../Modal";
 
@@ -12,7 +12,7 @@ interface IProps {
 
 function Comment({ comment, getComments }: IProps) {
   // Context
-  const { user } = useContext(UserContext);
+  const { user } = useUser();
 
   // States
   const [showDeleteModal, setShowDeleteModal] = useState(false);

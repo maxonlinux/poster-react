@@ -7,27 +7,23 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useArticles } from "../../Hooks/useArticles";
 
 interface IProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  getArticles: () => void;
+  editArticle: (article: IBaseArticle) => Promise<void>;
   article: IArticle;
 }
 
 function EditArticleModal({
   showModal,
   setShowModal,
-  getArticles,
+  editArticle,
   article,
 }: IProps) {
   // States
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(true);
   const [editedArticle, setEditedArticle] = useState<IBaseArticle>(article);
-
-  // Declare hooks
-  const { editArticle } = useArticles();
 
   // Two-way binding
   const handleChange = (
@@ -68,10 +64,9 @@ function EditArticleModal({
           e.preventDefault();
           editArticle(editedArticle);
           setShowModal(false);
-          getArticles();
         }}
       >
-        <label htmlFor="title">
+        <div>
           <div className="text-xs text-gray-600 mb-2 ml-2">Title</div>
           <input
             className="input w-full"
@@ -81,8 +76,8 @@ function EditArticleModal({
             value={editedArticle.title}
             onChange={handleChange}
           />
-        </label>
-        <label htmlFor="description">
+        </div>
+        <div>
           <div className="text-xs text-gray-600 mb-2 ml-2">Description</div>
           <textarea
             className="textarea w-full"
@@ -91,8 +86,8 @@ function EditArticleModal({
             value={editedArticle.description}
             onChange={handleChange}
           />
-        </label>
-        <label htmlFor="content">
+        </div>
+        <div>
           <div className="text-xs text-gray-600 mb-2 ml-2">Content</div>
           <textarea
             className="textarea w-full"
@@ -101,7 +96,7 @@ function EditArticleModal({
             value={editedArticle.content}
             onChange={handleChange}
           />
-        </label>
+        </div>
         <div className="flex gap-2 justify-end">
           <button
             className="button-sm bg-accent text-white disabled:opacity-50"

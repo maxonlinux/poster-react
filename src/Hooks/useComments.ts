@@ -1,33 +1,62 @@
-import { useCallback, useContext, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import { useCallback, useState } from "react";
 import { ToastStatus } from "../types/toaster";
-import { ToasterContext } from "../components/Context/ToasterContext";
-import { UserContext } from "../components/Context/UserContext";
+import { useToaster } from "../components/Context/ToasterContext";
+import { useUser } from "../components/Context/UserContext";
 import { IBaseComment, IComment } from "../types/comment";
-import { TError } from "../types/general";
+import { ResponseStatus, TResponseError } from "../types/general";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./useAuth";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const useComments = () => {
     // Context
-    const { addToast } = useContext(ToasterContext)
-    const { user } = useContext(UserContext);
+    const { addToast } = useToaster()
+    const { user } = useUser()
 
     // States
-    const [error, setError] = useState<unknown>(null);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [status, setStatus] = useState<ResponseStatus>(ResponseStatus.Loading);
     const [comments, setComments] = useState<IComment[]>([]);
+
+    // Declare hooks
+    const navigate = useNavigate()
+    const { logOut } = useAuth()
+
+    // Handlers
+    const handleLogout = () => {
+        logOut()
+        navigate('/login')
+    }
+
+    const handleError = (error: TResponseError) => {
+        setStatus(ResponseStatus.Error);
+        console.error('Error:', error);
+
+        if (error.response.status === 401) {
+            handleLogout()
+            addToast(error.response.data.error, ToastStatus.Error);
+        } else {
+            addToast((error as AxiosError).message, ToastStatus.Error);
+        }
+    };
 
     // Get comments
     const getComments = useCallback(async (articleId: string) => {
         try {
+            setStatus(ResponseStatus.Loading)
             const response = await axios.get<IComment[]>(
-                import.meta.env.VITE_BASE_URL + "/comments/article/" + articleId
+                `${BASE_URL}/comments/article/${articleId}`
             );
+
+            if (response.data.length === 0) {
+                return setStatus(ResponseStatus.Empty)
+            }
+
             setComments(response.data);
+            setStatus(ResponseStatus.Success)
         } catch (error) {
-            setError(error);
-            console.error("Error in getting comments:", error);
-        } finally {
-            setLoading(false);
+            handleError(error as TResponseError)
         }
     }, []);
 
@@ -35,7 +64,7 @@ export const useComments = () => {
     const createComment = async (comment: IBaseComment) => {
         try {
             await axios.post(
-                import.meta.env.VITE_BASE_URL + "/comments",
+                `${BASE_URL}/comments`,
                 comment,
                 {
                     headers: {
@@ -46,16 +75,14 @@ export const useComments = () => {
             );
             addToast("Successfully commented", ToastStatus.Success);
         } catch (error) {
-            const err = error as TError;
-            addToast(err.response.data.error, ToastStatus.Error);
-            console.error("Error in getting comments:", error);
+            handleError(error as TResponseError)
         }
     };
 
-    // Delete comments
+    // Delete comment
     const deleteComment = async (id: string) => {
         try {
-            await axios.delete(import.meta.env.VITE_BASE_URL + "/comments/" + id, {
+            await axios.delete(`${BASE_URL}/comments/${id}`, {
                 headers: {
                     Authorization: user?.token,
                     "Content-Type": "application/json",
@@ -63,11 +90,9 @@ export const useComments = () => {
             });
             addToast("Successfully deleted comment", ToastStatus.Success);
         } catch (error) {
-            const err = error as TError;
-            addToast(err.response.data.error, ToastStatus.Error);
-            console.error("Error in deleting article:", error);
+            handleError(error as TResponseError)
         }
     };
 
-    return { comments, error, loading, getComments, deleteComment, createComment };
+    return { status, comments, getComments, deleteComment, createComment };
 };

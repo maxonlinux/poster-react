@@ -1,6 +1,8 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { useComments } from "../../Hooks/useComments";
 import { IBaseComment, InitialComment } from "../../types/comment";
+import { UserRole } from "../../types/user";
+import { useUser } from "../Context/UserContext";
 
 function CreateComment({
   articleId,
@@ -9,17 +11,22 @@ function CreateComment({
   articleId: string;
   getComments: () => void;
 }) {
+  // Context
+  const { user } = useUser();
+
+  // Initial comment
+  const initialComment = {
+    ...InitialComment,
+    articleId,
+  };
+
   // States
-  const [comment, setComment] = useState<IBaseComment>(InitialComment);
+  const [comment, setComment] = useState<IBaseComment>(initialComment);
   const [isLeaveCommentDisabled, setIsLeaveCommentDisabled] =
     useState<boolean>(true);
 
   // Declare hooks
   const { createComment } = useComments();
-
-  useEffect(() => {
-    setComment({ ...comment, articleId });
-  }, []);
 
   // Hooks
   useEffect(() => {
@@ -29,6 +36,40 @@ function CreateComment({
       setIsLeaveCommentDisabled(false);
     }
   }, [comment, setIsLeaveCommentDisabled]);
+
+  const LeaveCommentButton = () => {
+    if (!user || user.role < UserRole.Admin) {
+      return (
+        <button
+          className="button-lg flex-shrink-0 bg-accent bg-opacity-10 text-accent
+            max-sm:w-full
+            disabled:opacity-50"
+          onClick={async () => {}}
+        >
+          Sign in to leave comment
+          <span className="ic">east</span>
+        </button>
+      );
+    }
+
+    return (
+      <button
+        className="button-lg flex-shrink-0 bg-accent bg-opacity-10 text-accent
+            max-sm:w-full
+            disabled:opacity-50"
+        disabled={isLeaveCommentDisabled}
+        onClick={async () => {
+          setIsLeaveCommentDisabled(true);
+          await createComment(comment);
+          getComments();
+          setComment(initialComment);
+        }}
+      >
+        Leave comment
+        <span className="ic">east</span>
+      </button>
+    );
+  };
 
   // Two-way binding
   const handleChange = (
@@ -45,26 +86,12 @@ function CreateComment({
     <div className="flex items-center w-full bg-gray-50 p-2 gap-2 border rounded-xl sm:h-20 border-gray-100 max-sm:flex-col">
       <textarea
         className="p-4 border border-gray-200 rounded-lg h-full appearance-none resize-none w-full"
-        placeholder="Add comment..."
+        placeholder="Add comment... (max. 150 symbols)"
         name="content"
         value={comment.content}
         onChange={handleChange}
       />
-      <button
-        className="button-lg flex-shrink-0 bg-accent bg-opacity-10 text-accent
-              max-sm:w-full
-              disabled:opacity-50"
-        disabled={isLeaveCommentDisabled}
-        onClick={async () => {
-          setIsLeaveCommentDisabled(true);
-          await createComment(comment);
-          getComments();
-          setComment(InitialComment);
-        }}
-      >
-        Leave comment
-        <span className="ic">east</span>
-      </button>
+      <LeaveCommentButton />
     </div>
   );
 }

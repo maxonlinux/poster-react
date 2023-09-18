@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { IArticle } from "../../types/article";
+import { IArticle, TDeleteArticle, TEditArticle } from "../../types/article";
 import EditArticleModal from "./EditArticleModal";
 import DeleteArticleModal from "./DeleteArticleModal";
 
 interface IProps {
   article: IArticle;
-  getArticles: () => void;
+  editArticle: TEditArticle;
+  deleteArticle: TDeleteArticle;
 }
 
-function ArticleRow({ article, getArticles }: IProps) {
+function ArticleRow({ article, editArticle, deleteArticle }: IProps) {
   // States
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
@@ -19,13 +20,13 @@ function ArticleRow({ article, getArticles }: IProps) {
       <EditArticleModal
         showModal={showEditModal}
         setShowModal={setShowEditModal}
-        getArticles={getArticles}
+        editArticle={editArticle}
         article={article}
       />
       <DeleteArticleModal
         showModal={showDeleteModal}
         setShowModal={setShowDeleteModal}
-        getArticles={getArticles}
+        deleteArticle={deleteArticle}
         id={article._id}
       />
     </>
@@ -91,7 +92,7 @@ function ArticleRow({ article, getArticles }: IProps) {
             max-md:py-2 max-md:px-4"
               onClick={() => setShowEditModal(true)}
             >
-              <span className="ic text-xl">edit</span>
+              <span className="ic text-xl">stylus</span>
               <span
                 className="font-bold
                 md:hidden"

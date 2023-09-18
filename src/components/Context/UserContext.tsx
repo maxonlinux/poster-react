@@ -1,11 +1,14 @@
-import { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useContext, useState } from "react";
 import { IUserContext, TUser } from "../../types/user";
 
 // Set default value for context to prevent TS errors
-export const UserContext = createContext<IUserContext>({
+const UserContext = createContext<IUserContext>({
   user: null,
   setUser: () => {},
 });
+
+// Context hook
+export const useUser = () => useContext(UserContext);
 
 // Set provider wrapper
 function UserProvider({ children }: { children: ReactNode }) {

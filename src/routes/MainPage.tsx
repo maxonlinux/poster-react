@@ -1,39 +1,37 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import Articles from "../components/Articles/Articles";
-import StateHandler from "../components/StateHandler/StateHandler";
+import StateHandler from "../components/ResponseStatusHandler/ResponseStatusHandler";
 import { useLocation } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import { useArticles } from "../Hooks/useArticles";
 
 function MainPage() {
-  // Hooks declaration
-  const location = useLocation();
-  const { error, loading, articles, totalArticles, getArticles } =
-    useArticles();
+  // Declare hooks and constants
+  const { search } = useLocation();
 
-  const queryParams = new URLSearchParams(location.search);
-  const page = queryParams.get("page") ?? "1";
-  const limit = queryParams.get("limit") ?? "12";
+  const queryParams = new URLSearchParams(search);
+  const page = parseInt(queryParams.get("page") ?? "1");
+  const limit = parseInt(queryParams.get("limit") ?? "12");
 
-  const currentPage = parseInt(page);
-  const articlesPerPage = parseInt(limit);
-
-  // Handlers
-  const handleGetArticles = useCallback(() => {
-    getArticles(currentPage, articlesPerPage);
-  }, [currentPage, articlesPerPage]);
+  const {
+    status,
+    articles,
+    getArticles,
+    deleteArticle,
+    editArticle,
+  } = useArticles(page, limit);
 
   // Hooks
   useEffect(() => {
-    handleGetArticles();
-  }, [handleGetArticles]);
+    getArticles();
+  }, [getArticles]);
 
   return (
-    <div className="flex h-full flex-col p-4">
+    <div className="flex flex-col p-4">
       <h1 className="font-bold text-xl px-4 mb-4">
-        Articles ({totalArticles})
+        Articles ({articles.total})
       </h1>
-      <StateHandler state={{ error, loading, length: articles.length }}>
+      <StateHandler status={status}>
         <StateHandler.Loading>
           <div className="flex flex-col justify-center items-center h-full font-bold">
             Loading...
@@ -44,7 +42,7 @@ function MainPage() {
             <span className="font-bold mb-4">Error in getting articles!</span>
             <button
               className="button-md bg-gray-50 border border-gray-100"
-              onClick={handleGetArticles}
+              onClick={getArticles}
             >
               <span className="ic">refresh</span>
               Try again
@@ -57,11 +55,15 @@ function MainPage() {
           </div>
         </StateHandler.Empty>
         <StateHandler.Success>
-          <Articles articles={articles} getArticles={handleGetArticles} />
+          <Articles
+            articles={articles.items}
+            deleteArticle={deleteArticle}
+            editArticle={editArticle}
+          />
           <Pagination
-            itemsPerPage={articlesPerPage}
-            totalItems={totalArticles}
-            currentPage={currentPage}
+            itemsPerPage={limit}
+            totalItems={articles.total}
+            currentPage={page}
           />
         </StateHandler.Success>
       </StateHandler>

@@ -1,12 +1,15 @@
-import { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useContext, useState } from "react";
 import { IToast, IToasterContext, ToastStatus } from "../../types/toaster";
 
 // Set default context to prevent TS errors
-export const ToasterContext = createContext<IToasterContext>({
+const ToasterContext = createContext<IToasterContext>({
   toasts: [],
   setToasts: () => {},
   addToast: () => {},
 });
+
+// Context hook
+export const useToaster = () => useContext(ToasterContext);
 
 // Set provider wrapper
 function ToasterProvider({ children }: { children: ReactNode }) {

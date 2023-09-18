@@ -1,21 +1,19 @@
 import { Dispatch, SetStateAction } from "react";
 import Modal from "../Modal";
-import { useArticles } from "../../Hooks/useArticles";
 
 interface IProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  getArticles: () => void;
+  deleteArticle: (id: string) => Promise<void>;
   id: string;
 }
 
 function DeleteArticleModal({
   showModal,
   setShowModal,
-  getArticles,
+  deleteArticle,
   id,
 }: IProps) {
-  const { deleteArticle } = useArticles();
   return (
     <Modal openState={[showModal, setShowModal]} title="Delete Article">
       <span>Are you sure? This cannot be undone!</span>
@@ -25,7 +23,6 @@ function DeleteArticleModal({
           onClick={() => {
             deleteArticle(id);
             setShowModal(false);
-            getArticles();
           }}
         >
           Confirm

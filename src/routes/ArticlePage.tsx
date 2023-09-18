@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import Comments from "../components/Comments/Comments";
-import StateHandler from "../components/StateHandler/StateHandler";
+import StateHandler from "../components/ResponseStatusHandler/ResponseStatusHandler";
 import { useArticle } from "../Hooks/useArticle";
 
 function ArticlePage() {
@@ -10,7 +10,7 @@ function ArticlePage() {
 
   // Declare hooks
   const navigate = useNavigate();
-  const { getArticle, article, error, loading } = useArticle();
+  const { getArticle, article, status } = useArticle();
 
   // Article Component
   const Article = () => {
@@ -38,8 +38,8 @@ function ArticlePage() {
   }, [id]);
 
   return (
-    <div className="flex flex-col h-full px-4">
-      <StateHandler state={{ error, loading }}>
+    <div className="flex flex-col p-4">
+      <StateHandler status={status}>
         <StateHandler.Loading>
           <div className="text-center font-bold">Loading...</div>
         </StateHandler.Loading>

@@ -1,19 +1,20 @@
-import { IArticle } from "../../types/article";
-import { useContext, useState } from "react";
+import { IArticle, TDeleteArticle, TEditArticle } from "../../types/article";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../Context/UserContext";
+import { useUser } from "../Context/UserContext";
 import EditArticleModal from "../Admin/EditArticleModal";
 import DeleteArticleModal from "../Admin/DeleteArticleModal";
+import { useState } from "react";
 
 // Props Interface
 interface IProps {
   article: IArticle;
-  getArticles: () => void;
+  deleteArticle: TDeleteArticle;
+  editArticle: TEditArticle;
 }
 
-function Article({ article, getArticles }: IProps) {
+function Article({ article, deleteArticle, editArticle }: IProps) {
   // Context
-  const { user } = useContext(UserContext);
+  const { user } = useUser();
 
   // States
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -41,13 +42,13 @@ function Article({ article, getArticles }: IProps) {
       <EditArticleModal
         showModal={showEditModal}
         setShowModal={setShowEditModal}
-        getArticles={getArticles}
+        editArticle={editArticle}
         article={article}
       />
       <DeleteArticleModal
         showModal={showDeleteModal}
         setShowModal={setShowDeleteModal}
-        getArticles={getArticles}
+        deleteArticle={deleteArticle}
         id={article._id}
       />
     </>
@@ -73,7 +74,7 @@ function Article({ article, getArticles }: IProps) {
             setShowEditModal(true);
           }}
         >
-          <span className="ic">edit</span>
+          <span className="ic">stylus</span>
           <span className="sm:hidden">Edit</span>
         </button>
       </div>

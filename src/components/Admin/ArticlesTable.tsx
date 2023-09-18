@@ -1,26 +1,28 @@
-import { IArticle } from "../../types/article";
+import { IArticle, TDeleteArticle, TEditArticle } from "../../types/article";
 import ArticleRow from "./ArticleRow";
 
 interface IProps {
   articles: IArticle[];
-  getArticles: () => void;
+  deleteArticle: TDeleteArticle;
+  editArticle: TEditArticle;
 }
 
-function ArticlesTable({ articles, getArticles }: IProps) {
+function ArticlesTable({ articles, deleteArticle, editArticle }: IProps) {
   // Mapped articles component
   const ArticlesMap = () =>
     articles.map((article) => (
       <ArticleRow
         key={article._id}
         article={article}
-        getArticles={getArticles}
+        editArticle={editArticle}
+        deleteArticle={deleteArticle}
       />
     ));
 
   return (
     <>
       <table
-        className="w-full responsive-table
+        className="w-full
       max-md:block"
       >
         <thead

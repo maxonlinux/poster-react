@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { IToast } from "../../types/toaster";
 import { createPortal } from "react-dom";
-import { ToasterContext } from "../Context/ToasterContext";
+import { useToaster } from "../Context/ToasterContext";
 
 function Toaster() {
   // States
-  const { toasts, setToasts } = useContext(ToasterContext);
+  const { toasts, setToasts } = useToaster();
   const [localToasts, setLocalToasts] = useState<IToast[]>([]);
 
   // Close toast

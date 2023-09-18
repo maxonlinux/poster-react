@@ -7,14 +7,11 @@ import ArticlePage from "./routes/ArticlePage";
 import AdminPage from "./routes/AdminPage";
 import NotFoundPage from "./routes/NotFoundPage";
 import Toaster from "./components/Toaster/Toaster";
-import { UserContext } from "./components/Context/UserContext";
-import { useContext } from "react";
 import MainPage from "./routes/MainPage";
+import RegisterPage from "./routes/RegisterPage";
+import { UserRole } from "./types/user";
 
 function App() {
-  // Contexts
-  const { user } = useContext(UserContext);
-
   return (
     <>
       <Toaster />
@@ -24,15 +21,23 @@ function App() {
           <Route
             path="/login"
             element={
-              <RouteProtector onlyForRoles={[0]}>
+              <RouteProtector onlyForRoles={[UserRole.Guest]}>
                 <LoginPage />
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <RouteProtector onlyForRoles={[UserRole.Guest]}>
+                <RegisterPage />
               </RouteProtector>
             }
           />
           <Route
             path="/admin"
             element={
-              <RouteProtector onlyForRoles={[1]}>
+              <RouteProtector onlyForRoles={[UserRole.Admin]}>
                 <AdminPage />
               </RouteProtector>
             }

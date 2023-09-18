@@ -13,6 +13,10 @@
   -webkit-text-size-adjust: 100%;
 }
 
+html {
+  @apply text-gray-900
+}
+
 body {
   @apply fixed w-full overflow-hidden flex min-w-[320px] min-h-screen bg-gray-50
 }

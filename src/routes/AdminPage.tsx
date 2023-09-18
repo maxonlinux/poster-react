@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Pagination from "../components/Pagination";
-import StateHandler from "../components/StateHandler/StateHandler";
+import StateHandler from "../components/ResponseStatusHandler/ResponseStatusHandler";
 import CreateArticleModal from "../components/Admin/CreateArticleModal";
 import ArticlesTable from "../components/Admin/ArticlesTable";
 import { useArticles } from "../Hooks/useArticles";
@@ -10,40 +10,38 @@ function AdminPage() {
   // States
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Declare hooks
-  const location = useLocation();
-  const { error, loading, articles, totalArticles, getArticles } =
-    useArticles();
+  // Declare hooks and constants
+  const { search } = useLocation();
 
-  // Constants
-  const queryParams = new URLSearchParams(location.search);
-  const page = queryParams.get("page") ?? "1";
-  const limit = queryParams.get("limit") ?? "12";
+  const queryParams = new URLSearchParams(search);
+  const page = parseInt(queryParams.get("page") ?? "1");
+  const limit = parseInt(queryParams.get("limit") ?? "12");
 
-  const currentPage = parseInt(page);
-  const articlesPerPage = parseInt(limit);
-
-  // Handlers
-  const handleGetArticles = () => {
-    getArticles(currentPage, articlesPerPage);
-  };
+  const {
+    status,
+    articles,
+    getArticles,
+    editArticle,
+    deleteArticle,
+    createArticle,
+  } = useArticles(page, limit);
 
   // Hooks
   useEffect(() => {
-    handleGetArticles();
-  }, [currentPage, articlesPerPage]);
+    getArticles();
+  }, [getArticles]);
 
   return (
     <>
       <CreateArticleModal
         showModal={showCreateModal}
         setShowModal={setShowCreateModal}
-        getArticles={handleGetArticles}
+        createArticle={createArticle}
       />
       <div className="h-full">
         <div className="flex flex-col p-4">
           <h1 className="font-bold text-xl px-4 mb-4">
-            Manage articles ({totalArticles})
+            Manage articles ({articles.total})
           </h1>
           <button
             className="button-md bg-accent bg-opacity-20 text-accent mb-4"
@@ -54,7 +52,7 @@ function AdminPage() {
           </button>
           <div className="mx-auto w-full">
             <div className="border border-gray-200 px-4 rounded-lg">
-              <StateHandler state={{ error, loading, length: articles.length }}>
+              <StateHandler status={status}>
                 <StateHandler.Loading>
                   <div className="text-center font-bold">Loading...</div>
                 </StateHandler.Loading>
@@ -79,16 +77,17 @@ function AdminPage() {
                 </StateHandler.Empty>
                 <StateHandler.Success>
                   <ArticlesTable
-                    articles={articles}
-                    getArticles={handleGetArticles}
+                    articles={articles.items}
+                    deleteArticle={deleteArticle}
+                    editArticle={editArticle}
                   />
                 </StateHandler.Success>
               </StateHandler>
             </div>
             <Pagination
-              itemsPerPage={articlesPerPage}
-              totalItems={totalArticles}
-              currentPage={currentPage}
+              itemsPerPage={limit}
+              totalItems={articles.total}
+              currentPage={page}
             />
           </div>
         </div>

@@ -31,7 +31,7 @@ function Modal({ openState, title, children }: IProps) {
       className="fixed flex items-center justify-center w-full p-4 h-full left-0 top-0 bg-black/50 z-50"
       onClick={handleBackgroundClick}
     >
-      <div className="flex flex-col w-full max-w-md bg-white p-6 rounded-lg">
+      <div className="flex flex-col w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
         <span className="font-bold text-lg mb-2">{title}</span>
         {children}
       </div>
