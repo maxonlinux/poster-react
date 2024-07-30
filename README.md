@@ -1,5 +1,5 @@
 # Poster React
-Poster app is a simple React blog app that allows you to create, edit and delete articles and leave comments.
+Poster is a demo application that was part of a contest. It is a simple React app that allows users to create, edit and delete articles and leave comments.
 
 ## Preparation Instructions
 `Node.js` and `npm` should be installed on your machine.
